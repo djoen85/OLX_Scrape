@@ -1,0 +1,75 @@
+#-------------------------------------------------------------------------------
+# Name:        olx_scrape
+# Purpose:
+#
+# Author:      jun
+#
+# Created:     31/10/2018
+# Copyright:   (c) jun 2018
+# Licence:     <junaidin>
+#-------------------------------------------------------------------------------
+
+from bs4 import BeautifulSoup as soup
+import requests as req
+import csv
+
+headers = {
+    'User-Agent': 'Junaidin, example.com',
+    'From': 'junaidin@iuj.ac.jp'
+}
+
+csv_olx = open('olx_scrape_motor.csv','w',newline='')
+
+olx_write = csv.writer(csv_olx)
+
+olx_write.writerow(['tanggal','Merek','Jenis','Km','Harga'])
+
+pages = []
+
+for i in range (1,68):
+
+    olx_page = 'https://www.olx.co.id/motor/bekas/makassar-kota/'+'?page='+str(i) #+'.html'
+
+    pages.append(olx_page)
+
+#olx_soup = soup(olx_page.content,'lxml')
+
+#container = olx_soup.findAll('td',class_= 'offer')
+
+for datmot in pages:
+
+    olx_page = req.get(datmot)
+
+    olx_soup = soup(olx_page.content,'lxml')
+
+    container = olx_soup.findAll('td',class_= 'offer')
+
+
+    for container in olx_soup.findAll('td',class_= 'offer'):
+
+        tggl = container.p.text.strip()
+        print(tggl)
+
+        Jenis = container.h3.a.span.text.strip()
+        print(Jenis)
+
+        #untuk mendapatkan data jenis motor yang dijual
+        Merek = container.small.text.strip()
+
+        #km = container.div.text.strip()
+        #print(km)
+
+
+        #Tahun = container.div.text.strip()
+        #print(Tahun)
+
+
+        #untuk mendapatkan harga motor yang dijual
+        harga = container.strong.text.strip()
+        print(harga)
+
+
+        olx_write.writerow([tggl,Merek,Jenis,km,harga])
+        #olx_write.writerow([motor,harga])
+
+csv_olx.close()
